@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>obnizOS on M5StickC</title>
+  <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/obniz/obniz@develop/obniz.js" crossorigin="anonymous"></script>
+<!--  <script src="https://unpkg.com/obniz@2.2.0/obniz.js"></script>-->
+  <script src="../../../m5stickc.js"></script>
+</head>
+<body>
+
+<div id="obniz-debug"></div>
+
+<button class="btn btn-primary m5" id="on">ON</button>
+<button class="btn btn-primary m5" id="off">OFF</button>
+
+<script>
+
+
+  console.log("start");
+  let m5 = new M5StickC('60229520');
+
+  console.log("connecting");
+  m5.onconnect = async function () {
+    $('#on').click(function () {
+      m5.led.on();
+    });
+
+    $('#off').click(function () {
+      m5.led.off();
+    });
+
+  };
+
+
+</script>
+</body>
+</html>

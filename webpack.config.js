@@ -12,7 +12,7 @@ module.exports = {
 
   output: {
     path: path.join(__dirname),
-    filename: "m5sickc.js",
+    filename: "m5stickc.js",
     pathinfo: false,
     library: "M5StickC",
   },
