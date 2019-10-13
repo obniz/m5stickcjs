@@ -86,6 +86,7 @@ class M5StickC extends obniz_1.default {
             "led",
             "m5display",
             "axp",
+            "imu",
         ];
         for (const key of keys) {
             // @ts-ignore
