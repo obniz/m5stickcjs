@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const obniz_1 = __importDefault(require("obniz"));
-class M5stickc extends obniz_1.default {
+class M5StickC extends obniz_1.default {
     constructor(id, options) {
         super(id, options);
     }
@@ -26,18 +26,51 @@ class M5stickc extends obniz_1.default {
         // @ts-ignore
         this.m5i2c = this.getI2CWithConfig(i2cParams);
         this.axp = this.wired("AXP192", { i2c: this.m5i2c });
-        this.wait(200);
         const displayParams = { sclk: 13, mosi: 15, cs: 5, res: 18, dc: 23 };
         this.m5display = this.wired("ST7735S", displayParams);
         // @ts-ignore
         this.m5display.onWait = () => __awaiter(this, void 0, void 0, function* () {
             this.axp.set3VLDO2_3();
             this.axp.enableLDO2_3();
+            this.wait(200);
         });
         this.led = this.wired("LED", { anode: 10 });
         this._methodSwith(this.led, "on", "off");
         this.led.off();
         this._addToAllComponentKeys();
+    }
+    gyroWait() {
+        if (this.imu.constructor.name !== "MPU6886") {
+            throw new Error("gyroWait is supported only MPU6886 M5stickC");
+        }
+        return this.imu.getGyroWait();
+    }
+    accelerationWait() {
+        if (this.imu.constructor.name !== "MPU6886") {
+            throw new Error("accelerationWait is supported only MPU6886 M5stickC");
+        }
+        return this.imu.getAccelWait();
+    }
+    setupIMUWait() {
+        const i2c = this.m5i2c;
+        const onerror = i2c.onerror;
+        this.imu = this.wired("MPU6886", { i2c });
+        const p1 = this.imu.whoamiWait();
+        const p2 = new Promise((resolve, reject) => {
+            i2c.onerror = reject;
+        });
+        return Promise.race([p1, p2]).then((val) => {
+            if (!val) {
+                this.imu = this.wired("SH200Q", { i2c });
+                // @ts-ignore
+                this.imu._reset = () => {
+                    return;
+                };
+            }
+            // restore
+            i2c.onerror = onerror;
+            return this.imu;
+        });
     }
     _methodSwith(obj, func1, func2) {
         obj["_" + func1] = obj[func1];
@@ -67,4 +100,4 @@ class M5stickc extends obniz_1.default {
         }
     }
 }
-exports.M5stickc = M5stickc;
+exports.M5StickC = M5StickC;

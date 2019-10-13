@@ -1,4 +1,4 @@
 
-import {M5stickc} from "./m5stickc";
+import {M5StickC} from "./m5stickc";
 
-export = M5stickc;
+export = M5StickC;

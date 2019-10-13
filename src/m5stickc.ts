@@ -7,9 +7,11 @@ import {Button} from "obniz/parts/MovementSensor/Button";
 import {I2C} from "obniz/obniz/libs/io_peripherals/i2c";
 import {IO} from "obniz/obniz/libs/io_peripherals/io";
 import {ST7735S} from "obniz/parts/Display/ST7735S";
+import {MPU6886} from "obniz/parts/MovementSensor/MPU6886";
+import {SH200Q} from "obniz/parts/MovementSensor/SH200Q";
 import {AXP192} from "obniz/parts/Power/AXP192";
 
-export class M5stickc extends Obniz {
+export class M5StickC extends Obniz {
 
     public buttonA?: Button;
     public buttonB?: Button;
@@ -32,6 +34,8 @@ export class M5stickc extends Obniz {
     public m5display?: ST7735S;
     public m5i2c?: I2C;
 
+    public imu?: MPU6886 | SH200Q;
+
     constructor(id: string, options?: any) {
         super(id, options);
 
@@ -50,8 +54,7 @@ export class M5stickc extends Obniz {
         // @ts-ignore
         this.m5i2c = this.getI2CWithConfig(i2cParams);
 
-        this.axp =  this.wired("AXP192", {i2c: this.m5i2c});
-        this.wait(200);
+        this.axp = this.wired("AXP192", {i2c: this.m5i2c});
 
         const displayParams = {sclk: 13, mosi: 15, cs: 5, res: 18, dc: 23};
         this.m5display = this.wired("ST7735S", displayParams);
@@ -59,6 +62,7 @@ export class M5stickc extends Obniz {
         this.m5display.onWait = async () => {
             this.axp!.set3VLDO2_3();
             this.axp!.enableLDO2_3();
+            this.wait(200);
         };
 
         this.led = this.wired("LED", {anode: 10});
@@ -66,6 +70,45 @@ export class M5stickc extends Obniz {
         this.led.off();
 
         this._addToAllComponentKeys();
+
+    }
+
+    public gyroWait(): Promise<{ x: number, y: number, z: number }> {
+        if (this.imu!.constructor.name !== "MPU6886") {
+            throw new Error("gyroWait is supported only MPU6886 M5stickC");
+        }
+        return (this.imu! as MPU6886).getGyroWait();
+    }
+
+    public accelerationWait(): Promise<{ x: number, y: number, z: number }> {
+        if (this.imu!.constructor.name !== "MPU6886") {
+            throw new Error("accelerationWait is supported only MPU6886 M5stickC");
+        }
+        return (this.imu! as MPU6886).getAccelWait();
+    }
+
+    private setupIMUWait(): Promise<MPU6886|SH200Q> {
+        const i2c = this.m5i2c!;
+        const onerror = i2c.onerror;
+        this.imu = this.wired("MPU6886", {i2c});
+
+        const p1 = (this.imu as MPU6886).whoamiWait();
+        const p2 = new Promise((resolve, reject) => {
+            i2c.onerror = reject;
+        });
+        return Promise.race([p1, p2]).then((val) => {
+            if (!val) {
+                this.imu = this.wired("SH200Q", {i2c});
+
+                // @ts-ignore
+                this.imu._reset = () => {
+                    return;
+                };
+            }
+            // restore
+            i2c.onerror = onerror;
+            return this.imu!;
+        });
 
     }
 
@@ -84,6 +127,7 @@ export class M5stickc extends Obniz {
             "led",
             "m5display",
             "axp",
+            "imu",
         ];
 
         for (const key of keys) {
