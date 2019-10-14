@@ -6,11 +6,7 @@ It works on both browser and nodejs.
 
 # Usage
 
-### HTML
-
-
-
-### nodejs
+See [HTML Examples](./examples/html) or [Node.js Examples](./examples/nodejs)
 
 
 # Installation
