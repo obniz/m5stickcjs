@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <title>obnizOS on M5StickC</title>
   <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/obniz/obniz@develop/obniz.js" crossorigin="anonymous"></script>
-  <!--  <script src="https://unpkg.com/obniz@2.2.0/obniz.js"></script>-->
-  <script src="../../../m5stickc.js"></script>
+  <script src="https://unpkg.com/obniz@2.4.0/obniz.js"  crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/m5stickcjs/m5stickc.js"></script>
 </head>
 <body>
 
@@ -20,7 +19,7 @@ buttonB:<span id="buttonB"></span><br/>
 
 
   console.log("start");
-  let m5 = new M5StickC('60229520');
+  let m5 = new M5StickC('OBNIZ_ID_HERE');
 
   console.log("connecting");
   m5.onconnect = async function () {

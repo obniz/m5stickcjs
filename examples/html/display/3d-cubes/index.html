@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>obnizOS on M5StickC</title>
   <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
-  <script src="../../../../../obnizjs/obniz.js"></script>
+  <script src="https://unpkg.com/obniz@2.4.0-rc.0/obniz.js"  crossorigin="anonymous"></script>
   <script src="../../../../m5stickc.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/107/three.min.js"></script>
 </head>
@@ -21,7 +21,7 @@
 
 
   console.log("start");
-  let m5 = new M5StickC('60229520');
+  let m5 = new M5StickC('OBNIZ_ID_HERE');
 
   var domElement;
 

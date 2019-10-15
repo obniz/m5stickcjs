@@ -61,11 +61,13 @@ class M5StickC extends obniz_1.default {
         });
         return Promise.race([p1, p2]).then((val) => {
             if (!val) {
-                this.imu = this.wired("SH200Q", { i2c });
-                // @ts-ignore
-                this.imu._reset = () => {
-                    return;
-                };
+                throw new Error("Cannot find MPU6886 on this M5SticC");
+                // this.imu = this.wired("SH200Q", {i2c});
+                //
+                // // @ts-ignore
+                // this.imu._reset = () => {
+                //     return;
+                // };
             }
             // restore
             i2c.onerror = onerror;
@@ -92,7 +94,7 @@ class M5StickC extends obniz_1.default {
             // @ts-ignore
             this._allComponentKeys.push(key);
             // @ts-ignore
-            if (!this[key]._reset) {
+            if (this[key] && !this[key]._reset) {
                 // @ts-ignore
                 this[key]._reset = () => {
                     return;
