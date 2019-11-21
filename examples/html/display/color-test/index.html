@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>obnizOS on M5StickC</title>
+    <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
+    <script src="https://unpkg.com/obniz@2.4.0-rc.0/obniz.js" crossorigin="anonymous"></script>
+    <script src="../../../../m5stickc.js"></script>
+</head>
+
+<body>
+
+    <div id="obniz-debug"></div>
+    <canvas width="80" height="160" id="canvas"></canvas>
+
+    <script>
+        console.log("start");
+        let m5 = new M5StickC('OBNIZ_ID_HERE');
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+
+        m5.onconnect = async function () {
+            await m5.m5display.onWait();
+            // showExample();
+            showColorset();
+        }
+
+        function drawSample(n) {
+            let width = m5.m5display.width;
+            let height = m5.m5display.height;
+            let colors = [
+                { r: 0xff, g: 0x00, b: 0x00 },
+                { r: 0x00, g: 0xff, b: 0x00 },
+                { r: 0x00, g: 0x00, b: 0xff },
+                { r: 0x80, g: 0x00, b: 0x00 },
+                { r: 0x40, g: 0x00, b: 0x00 },
+                { r: 0x40, g: 0x40, b: 0x40 },
+                { r: 0x80, g: 0x80, b: 0x80 },
+                { r: 0xff, g: 0xff, b: 0xff },
+            ];
+
+            function raw(color) {
+                let pixels = [];
+                for (let i = 0; i < m5.m5display.width * m5.m5display.height; i++) {
+                    pixels.push(color);
+                }
+                m5.m5display.raw(pixels);
+            }
+
+            function color18(c) {
+                return c.r << 16 | c.g << 8 | c.b;
+            }
+
+            function rawBound(c) {
+                let pixels = [];
+                for (let i = 0; i < m5.m5display.width * m5.m5display.height; i++) {
+                    pixels.push(color18(c));
+                }
+                m5.m5display.rawBound(0, 0, m5.m5display.width, m5.m5display.height, pixels);
+            }
+
+            let i = n % colors.length;
+
+            let c = colors[i];
+            let color = m5.m5display.color16(c.r, c.g, c.b);
+            let bg = m5.m5display.color16(255, 255, 255);
+
+            ////////////
+            // m5.m5display.setRotation(0);
+            // m5.m5display.fillScreen(bg);
+            // m5.m5display.fillScreen(color);
+            // m5.m5display.fillRect(20, 30, 50, 70, color);
+            // m5.m5display.drawRect(20, 30, 50, 70, color);
+            // m5.m5display.drawCircle(m5.m5display.width / 2, m5.m5display.height / 2, m5.m5display.width / 2, color);
+            // m5.m5display.fillCircle(m5.m5display.width / 2, m5.m5display.height / 2, m5.m5display.width / 2, color);
+            // m5.m5display.drawRoundRect(20, 30, 50, 70, 10, color);
+            // m5.m5display.fillRoundRect(20, 30, 50, 70, 10, color);
+            // m5.m5display.drawTriangle(20, 30, 40, 80, 60, 40, color);
+            // m5.m5display.drawTriangle(20, 80, 20, 20, 60, 80, color);
+            // m5.m5display.fillTriangle(20, 80, 20, 20, 60, 80, color);
+            // m5.m5display.drawVLine(20, 30, 50, color);
+            // m5.m5display.drawHLine(20, 30, 50, color);
+            // m5.m5display.drawLine(20, 30, 50, 70, color);
+            // m5.m5display.drawPixel(m5.m5display.width / 2, m5.m5display.height / 2, color);
+            // m5.m5display.drawChar(20, 30, "a", color, bg, 2);
+            // m5.m5display.drawString(20, 30, "obniz", color, bg, 2, false);
+
+            // raw(color);
+            // rawBound(c);
+
+            ctx.clearRect(0, 0, width, height);
+            ctx.beginPath();
+            ctx.fillStyle = "rgb(" + c.r + ", " + c.g + ", " + c.b + ")";
+            ctx.fillRect(0, 0, 80, 160);
+            m5.m5display.draw(ctx);
+        }
+
+        function showExample() {
+            let i = 0;
+            setInterval(function () {
+                drawSample(i);
+                i++;
+            }, 1000);
+        }
+
+        function showColorset() {
+            let colors = Object.entries(m5.m5display.color).map(([key, value]) => ({ 'key': key, 'value': value }));
+            let i = 0;
+            m5.m5display.setRotation(1);
+
+            let repeat = setInterval(function () {
+                let color_name = colors[i].key;
+                let bg_color = colors[i].value;
+                console.log(color_name + " " + bg_color.toString(16));
+                let str_color = m5.m5display.reverseColor16(bg_color);
+                m5.m5display.fillScreen(bg_color);
+                m5.m5display.drawString(10, 10, color_name, str_color, bg_color, 2, false);
+                i++;
+                if (i > colors.length) {
+                    console.log("Finished!");
+                    clearInterval(repeat);
+                }
+            }, 1500);
+        }
+
+
+    </script>
+
+</body>
+
+</html>
