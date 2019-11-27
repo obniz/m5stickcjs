@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>obnizOS on M5StickC</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+    <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
+    <script src="https://unpkg.com/obniz@2.5.0/obniz.js" crossorigin="anonymous"></script>
+    <script src="../../../../m5stickc.js"></script>
+    <script src="https://unpkg.com/qrious@4.0.2/dist/qrious.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <script>
+        configs = {
+            obniz_id: "OBNIZ_ID_HERE"
+        }
+    </script>
+
+    <div id="obniz-debug"></div>
+    <canvas width="80" height="160" id="canvas"></canvas><br />
+    <canvas id="qr" hidden=""></canvas>
+
+    <script>
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let obnizIdSplited = obnizIdString(configs.obniz_id);
+        var logo = new Image;
+        logo.src = "data:image/png;base64,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";
+
+        let m5 = new M5StickC(configs.obniz_id);
+
+        m5.onconnect = async function () {
+            m5.resetOnDisconnect(false);
+            await new Promise(resolve => {
+                setTimeout(resolve, 100)
+            });
+            await m5.m5display.onWait();
+
+            let width = m5.m5display.width;
+            let height = m5.m5display.height;
+
+            m5.m5display.setRotation(0);
+            ctx.resetTransform();
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#FFF';
+            ctx.fillRect(0, 0, width, height);
+
+            drawQrCode({ context: ctx, x: 2, y: 1, size: 75 });
+
+            ctx.fillStyle = '#000';
+            ctx.rotate(90 * Math.PI / 180);
+            ctx.font = "18px Montserrat";
+            ctx.textAlign = "right";
+
+            // logo.onload = function () {
+            ctx.drawImage(logo, 79, -75, 75, 75 * logo.height / logo.width);
+            m5.m5display.draw(ctx);
+            // }
+
+            ctx.fillText(obnizIdSplited[0], 145, -35);
+            ctx.fillText('-' + obnizIdSplited[1], 145, -15);
+
+            ctx.font = "9px Montserrat";
+            ctx.fillText('obnizOS' + ' > ' + m5.firmware_ver, 155, -3);
+
+            m5.m5display.draw(ctx);
+            await new Promise(resolve => {
+                setTimeout(resolve, 3000)
+            });
+            await m5.pingWait();
+            m5.close();
+        }
+
+        function drawQrCode({ context, x, y, size }) {
+            let qrCanvas = document.getElementById("qr");
+            var qr = new QRious({
+                element: qrCanvas,
+                value: 'http://obniz.io/P/' + configs.obniz_id,
+                padding: 0,
+                size: size,
+            });
+            var image = qrCanvas.getContext('2d').getImageData(0, 0, size, size);
+            context.putImageData(image, x, y);
+        }
+
+        function obnizIdString(id) {
+            let numString = ('' + id).split('-').join("");
+            return [numString.substr(0, 4), numString.substr(4, 4)];
+        }
+
+    </script>
+</body>
+
+</html>
