@@ -5,10 +5,11 @@
   <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
   <script src="https://unpkg.com/obniz@2.4.0/obniz.js"  crossorigin="anonymous"></script>
   <script src="https://unpkg.com/m5stickcjs/m5stickc.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 </head>
 <body>
-<div id="obniz-debug"></div>
+
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
@@ -19,9 +20,11 @@ bpm : <span id="bpm"></span>
 <script>
   let myChart;
   setupCharts();
-  var m5 = new M5StickC("OBNIZ_ID_HERE");
-
+  var m5 = new M5StickC("09130585");
+  m5.onerror = ()=>{}
+  m5.onwarn = ()=>{}
   m5.onconnect = async function () {
+
     let device = m5.wired("Puls08M5stickcS", {tx: 26, rx: 0});
     device.onbpmupdate = (bpm) => {
       $("#bpm").text(bpm.toFixed(1));
@@ -91,7 +94,7 @@ bpm : <span id="bpm"></span>
 
   function scrollToRight() {
     myChart.options.scales.xAxes[0].time.max = x;
-    myChart.options.scales.xAxes[0].time.min = x - 10 * 1000;
+    myChart.options.scales.xAxes[0].time.min = x - 2 * 1000;
     for (let i = 0; i < myChart.data.datasets.length; i++) {
       myChart.data.datasets[i].data = myChart.data.datasets[i].data.filter((elm) => {
         return elm.x > myChart.options.scales.xAxes[0].time.min;

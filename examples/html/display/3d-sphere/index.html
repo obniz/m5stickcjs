@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <title>obnizOS on M5StickC</title>
   <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
-  <script src="https://unpkg.com/obniz@2.4.0-rc.0/obniz.js"  crossorigin="anonymous"></script>
+<!--  <script src="https://unpkg.com/obniz@2.4.0-rc.0/obniz.js"  crossorigin="anonymous"></script>-->
+  <script src="https://cdn.jsdelivr.net/gh/obniz/obniz@639a4cd3f4330bf5148c5a4739f4389c4757337b/obniz.js"  crossorigin="anonymous"></script>
   <script src="https://unpkg.com/m5stickcjs/m5stickc.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.js"></script>
 </head>
@@ -19,7 +20,7 @@
 
 
   console.log("start");
-  let m5 = new M5StickC('OBNIZ_ID_HERE');
+  let m5 = new M5StickC('09130585');
 
   m5.onconnect = async function () {
     await m5.wait(100);
@@ -44,7 +45,7 @@
 
     var geometry = new THREE.SphereGeometry(radius, segments, rings);
     var material = new THREE.MeshBasicMaterial({
-      color: 0xF3A2B0,
+      color: 0x0000FF,
       wireframe: true
     });
 

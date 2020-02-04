@@ -1,15 +1,16 @@
 import Obniz from "obniz";
 
-import {InfraredLED} from "obniz/parts/Infrared/InfraredLED";
-import {LED} from "obniz/parts/Light/LED";
-import {Button} from "obniz/parts/MovementSensor/Button";
+import InfraredLED from "obniz/dist/src/parts/Infrared/InfraredLED";
+import LED from "obniz/dist/src/parts/Light/LED";
+import Button from "obniz/dist/src/parts/MovementSensor/Button";
 
-import {I2C} from "obniz/obniz/libs/io_peripherals/i2c";
-import {IO} from "obniz/obniz/libs/io_peripherals/io";
-import {ST7735S} from "obniz/parts/Display/ST7735S";
-import {MPU6886} from "obniz/parts/MovementSensor/MPU6886";
-import {SH200Q} from "obniz/parts/MovementSensor/SH200Q";
-import {AXP192} from "obniz/parts/Power/AXP192";
+import I2C from "obniz/dist/src/obniz/libs/io_peripherals/i2c";
+import IO from "obniz/dist/src/obniz/libs/io_peripherals/io";
+import ST7735S from "obniz/dist/src/parts/Display/ST7735S";
+import {I2cPartsAbstructOptions} from "obniz/dist/src/parts/i2cParts";
+import MPU6886 from "obniz/dist/src/parts/MovementSensor/MPU6886";
+import SH200Q from "obniz/dist/src/parts/MovementSensor/SH200Q";
+import AXP192 from "obniz/dist/src/parts/Power/AXP192";
 
 export class M5StickC extends Obniz {
 
@@ -54,7 +55,7 @@ export class M5StickC extends Obniz {
         // @ts-ignore
         this.m5i2c = this.getI2CWithConfig(i2cParams);
 
-        this.axp = this.wired("AXP192", {i2c: this.m5i2c});
+        this.axp = this.wired("AXP192", {i2c: this.m5i2c} as I2cPartsAbstructOptions);
 
         const displayParams = {sclk: 13, mosi: 15, cs: 5, res: 18, dc: 23};
         this.m5display = this.wired("ST7735S", displayParams);
