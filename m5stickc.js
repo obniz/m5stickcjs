@@ -144,7 +144,7 @@ class M5StickC extends obniz_1.default {
         this._addToAllComponentKeys();
     }
     gyroWait() {
-        let supportedIMUNameArr=["MPU6886"];
+        let supportedIMUNameArr=["MPU6886", "SH200Q"];
         if (!(supportedIMUNameArr.includes(this.imu.constructor.name))){
             throw new Error("gyroWait is supported only on M5stickC with "+supportedIMUNameArr.join());
         }
