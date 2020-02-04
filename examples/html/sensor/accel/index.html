@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>obnizOS on M5StickC</title>
   <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
-  <script src="https://unpkg.com/obniz/obniz.js"></script>
+  <script src="https://unpkg.com/obniz@2.4.0/obniz.js"  crossorigin="anonymous"></script>
   <script src="https://unpkg.com/m5stickcjs/m5stickc.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></script>
@@ -16,9 +16,9 @@
 
 <fieldset>
   <legend>Accel</legend>
-  X:<span id="accel_x"></span>[g]<br/>
-  Y:<span id="accel_y"></span>[g]<br/>
-  Z:<span id="accel_z"></span>[g]
+  X:<span id="accel_x"></span>[m/s^2]<br/>
+  Y:<span id="accel_y"></span>[m/s^2]<br/>
+  Z:<span id="accel_z"></span>[m/s^2]
 </fieldset>
 
 <canvas id="myChart" style="width:100%;height:400px"></canvas>
@@ -43,10 +43,7 @@
   m5.onconnect = async function () {
     console.log("connected");
 
-    //specify IMU name: 'MPU6886' or 'SH200Q'
-    //if not specified then 'MPU6886'
-    await m5.setupIMUWait('MPU6886');
-
+    await m5.setupIMUWait();
     while(1) {
       let data = await m5.accelerationWait();
       $("#accel_x").text(Number.parseFloat(data.x).toFixed(2));
@@ -99,11 +96,11 @@
           yAxes: [{
             scaleLabel: {
               display: true,
-              labelString: 'g'
+              labelString: 'm/s^2'
             },
             ticks: {
-              min: -2,
-              max:2
+              min: -20,
+              max:20
             }
 
           }]
