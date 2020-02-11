@@ -23,6 +23,7 @@
     console.log("start");
     let m5 = new M5StickC('OBNIZ_ID_HERE');
 
+
     m5.onconnect = async function () {
       await m5.wait(100);
       await m5.m5display.onWait();
@@ -49,6 +50,7 @@
         color: 0xF3A2B0,
         wireframe: true
       });
+
 
       var cube = new THREE.Mesh(geometry, material);
       scene.add(cube);
