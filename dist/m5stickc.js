@@ -34,35 +34,36 @@ class M5StickC extends obniz_1.default {
             this.axp.enableLDO2_3();
             this.wait(200);
         });
-        this.led = this.wired("LED", { anode: 10 });
-        this._methodSwith(this.led, "on", "off");
+        this.led = this.wired("LED", { cathode: 10 });
+        // this._methodSwith(this.led, "on", "off");
         this.led.off();
         this._addToAllComponentKeys();
     }
     gyroWait() {
-        if (this.imu.constructor.name !== "MPU6886") {
-            throw new Error("gyroWait is supported only MPU6886 M5stickC");
+        const supportedIMUNameArr = ["MPU6886", "SH200Q"];
+        if (!(supportedIMUNameArr.includes(this.imu.constructor.name))) {
+            throw new Error(`gyroWait is supported only on M5stickC with ${supportedIMUNameArr.join()}`);
         }
         return this.imu.getGyroWait();
     }
     accelerationWait() {
-        if (this.imu.constructor.name !== "MPU6886") {
-            throw new Error("accelerationWait is supported only MPU6886 M5stickC");
+        const supportedIMUNameArr = ["MPU6886", "SH200Q"];
+        if (!(supportedIMUNameArr.includes(this.imu.constructor.name))) {
+            throw new Error(`accelerationWait is supported only on M5stickC with ${supportedIMUNameArr.join()}`);
         }
         return this.imu.getAccelWait();
     }
-    setupIMUWait() {
+    setupIMUWait(imuName = "MPU6886") {
         const i2c = this.m5i2c;
         const onerror = i2c.onerror;
-        this.imu = this.wired("MPU6886", { i2c });
+        this.imu = this.wired(imuName, { i2c });
         const p1 = this.imu.whoamiWait();
         const p2 = new Promise((resolve, reject) => {
             i2c.onerror = reject;
         });
-        return Promise.race([p1, p2]).then((val) => {
+        return Promise.race([p1, p2]).then((val) => __awaiter(this, void 0, void 0, function* () {
             if (!val) {
-                throw new Error("Cannot find MPU6886 on this M5SticC");
-                // this.imu = this.wired("SH200Q", {i2c});
+                throw new Error(`Cannot find IMU (${imuName}) on this M5StickC`);
                 //
                 // // @ts-ignore
                 // this.imu._reset = () => {
@@ -71,8 +72,18 @@ class M5StickC extends obniz_1.default {
             }
             // restore
             i2c.onerror = onerror;
+            switch (imuName) {
+                case "SH200Q":
+                    yield this.imu.initWait();
+                    break;
+                case "MPU6886":
+                    this.imu.init();
+                    break;
+                default:
+                    break;
+            }
             return this.imu;
-        });
+        }));
     }
     _methodSwith(obj, func1, func2) {
         obj["_" + func1] = obj[func1];

@@ -1,0 +1,39 @@
+
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script src="https://obniz.io/js/jquery-3.2.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/obniz/obniz@639a4cd3f4330bf5148c5a4739f4389c4757337b/obniz.js"  crossorigin="anonymous"></script>
+<!--  <script src="https://unpkg.com/obniz@2.4.0-rc.0/obniz.js"  crossorigin="anonymous"></script>-->
+
+  <script src="https://unpkg.com/m5stickcjs/m5stickc.js"></script>
+</head>
+<body>
+
+<script>
+  function toHexString(byteArray) {
+    return Array.from(byteArray, function(byte) {
+      return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+    }).join(' ')
+  }
+
+  var m5 = new M5StickC("09130585");
+  m5.onconnect = async function () {
+    await m5.wait(100);
+    await m5.m5display.onWait();
+
+    const bg =  m5.m5display.color16(200, 10, 10);
+    const fr =  m5.m5display.color16(20, 200, 10);
+    const ge =  m5.m5display.color16(20, 20, 200);
+    const ba =  m5.m5display.color16(0, 0, 0);
+    m5.m5display.fillScreen(ba);
+    m5.m5display.setRotation(1);
+    m5.m5display.drawString( 5, 2, "I'm   using obniz!", fr, ba, 2, true);
+    m5.m5display.fillRect(10, 40, 30, 30, ge);
+    m5.m5display.fillCircle(65, 55, 15, bg);
+    m5.m5display.fillTriangle(105,40, 135, 40, 120, 70, fr);
+  }
+</script>
+</body>
+</html>
+

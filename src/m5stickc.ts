@@ -1,15 +1,16 @@
 import Obniz from "obniz";
 
-import {InfraredLED} from "obniz/parts/Infrared/InfraredLED";
-import {LED} from "obniz/parts/Light/LED";
-import {Button} from "obniz/parts/MovementSensor/Button";
+import InfraredLED from "obniz/dist/src/parts/Infrared/InfraredLED";
+import LED from "obniz/dist/src/parts/Light/LED";
+import Button from "obniz/dist/src/parts/MovementSensor/Button";
 
-import {I2C} from "obniz/obniz/libs/io_peripherals/i2c";
-import {IO} from "obniz/obniz/libs/io_peripherals/io";
-import {ST7735S} from "obniz/parts/Display/ST7735S";
-import {MPU6886} from "obniz/parts/MovementSensor/MPU6886";
-import {SH200Q} from "obniz/parts/MovementSensor/SH200Q";
-import {AXP192} from "obniz/parts/Power/AXP192";
+import I2C from "obniz/dist/src/obniz/libs/io_peripherals/i2c";
+import IO from "obniz/dist/src/obniz/libs/io_peripherals/io";
+import ST7735S from "obniz/dist/src/parts/Display/ST7735S";
+import {I2cPartsAbstructOptions} from "obniz/dist/src/parts/i2cParts";
+import MPU6886 from "obniz/dist/src/parts/MovementSensor/MPU6886";
+import SH200Q from "obniz/dist/src/parts/MovementSensor/SH200Q";
+import AXP192 from "obniz/dist/src/parts/Power/AXP192";
 
 export class M5StickC extends Obniz {
 
@@ -54,7 +55,7 @@ export class M5StickC extends Obniz {
         // @ts-ignore
         this.m5i2c = this.getI2CWithConfig(i2cParams);
 
-        this.axp = this.wired("AXP192", {i2c: this.m5i2c});
+        this.axp = this.wired("AXP192", {i2c: this.m5i2c} as I2cPartsAbstructOptions);
 
         const displayParams = {sclk: 13, mosi: 15, cs: 5, res: 18, dc: 23};
         this.m5display = this.wired("ST7735S", displayParams);
@@ -65,8 +66,8 @@ export class M5StickC extends Obniz {
             this.wait(200);
         };
 
-        this.led = this.wired("LED", {anode: 10});
-        this._methodSwith(this.led, "on", "off");
+        this.led = this.wired("LED", {cathode: 10});
+        // this._methodSwith(this.led, "on", "off");
         this.led.off();
 
         this._addToAllComponentKeys();
@@ -74,32 +75,33 @@ export class M5StickC extends Obniz {
     }
 
     public gyroWait(): Promise<{ x: number, y: number, z: number }> {
-        if (this.imu!.constructor.name !== "MPU6886") {
-            throw new Error("gyroWait is supported only MPU6886 M5stickC");
+        const supportedIMUNameArr = ["MPU6886", "SH200Q"];
+        if (!(supportedIMUNameArr.includes(this.imu!.constructor.name))) {
+            throw new Error(`gyroWait is supported only on M5stickC with ${supportedIMUNameArr.join()}`);
         }
-        return (this.imu! as MPU6886).getGyroWait();
+        return this.imu!.getGyroWait();
     }
 
     public accelerationWait(): Promise<{ x: number, y: number, z: number }> {
-        if (this.imu!.constructor.name !== "MPU6886") {
-            throw new Error("accelerationWait is supported only MPU6886 M5stickC");
+        const supportedIMUNameArr = ["MPU6886", "SH200Q"];
+        if (!(supportedIMUNameArr.includes(this.imu!.constructor.name))) {
+            throw new Error(`accelerationWait is supported only on M5stickC with ${supportedIMUNameArr.join()}`);
         }
-        return (this.imu! as MPU6886).getAccelWait();
+        return this.imu!.getAccelWait();
     }
 
-    private setupIMUWait(): Promise<MPU6886|SH200Q> {
+    private setupIMUWait(imuName: "MPU6886"|"SH200Q" = "MPU6886"): Promise<MPU6886|SH200Q> {
         const i2c = this.m5i2c!;
         const onerror = i2c.onerror;
-        this.imu = this.wired("MPU6886", {i2c});
+        this.imu = this.wired(imuName, {i2c});
 
-        const p1 = (this.imu as MPU6886).whoamiWait();
+        const p1 = this.imu.whoamiWait();
         const p2 = new Promise((resolve, reject) => {
             i2c.onerror = reject;
         });
-        return Promise.race([p1, p2]).then((val) => {
+        return Promise.race([p1, p2]).then(async (val) => {
             if (!val) {
-                throw new Error("Cannot find MPU6886 on this M5SticC");
-                // this.imu = this.wired("SH200Q", {i2c});
+                throw new Error(`Cannot find IMU (${imuName}) on this M5StickC`);
                 //
                 // // @ts-ignore
                 // this.imu._reset = () => {
@@ -108,6 +110,16 @@ export class M5StickC extends Obniz {
             }
             // restore
             i2c.onerror = onerror;
+            switch (imuName) {
+                case "SH200Q":
+                    await (this.imu as SH200Q).initWait();
+                    break;
+                case "MPU6886":
+                    (this.imu as MPU6886).init();
+                    break;
+                default:
+                    break;
+            }
             return this.imu!;
         });
 
