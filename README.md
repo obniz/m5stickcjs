@@ -1,5 +1,18 @@
 # M5StickC.js
 
+
+** 
+This SDK is currently out of maintenance.
+M5StickC.js has been merged into obniz.js.
+Please use obnizjs v3.4.0 or later to be create M5StickC instance. **
+
+```
+const m5 = new Obniz.M5StickC("obniz_id"); // on obniz.js v3.4.0 or later
+```
+
+---
+
+
 SDK for controlling [M5StickC](https://docs.m5stack.com/#/en/core/m5stickc) with [obnizOS](https://obniz.io).
 It works on both browser and nodejs.
 
